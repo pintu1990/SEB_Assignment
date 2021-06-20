@@ -1,0 +1,41 @@
+#------ This code snippets mysql table creation scripts where we are creating two tables fhvhv_tripdata_jan2020 and fhvhv_tripdata_feb2020. 
+# These tables will hold the trip details data from NYC,TLC website. Files will be downloaded from the NYC website and content of these files will be loaded to these tables.
+#We need both main as well as staging tables as during load the records will be loaded to staging table intially and will be dumped to main table. This will avoid any impact to 
+#our own table during load process
+
+CREATE TABLE fhvhv_tripdata_jan2020 
+(hvfhs_license_num varchar(6),
+ dispatching_base_num varchar(6),
+ pickup_datetime timestamp,
+ dropoff_datetime timestamp,
+ PULocationID int,
+ DOLocationID int,
+ SR_Flag int);
+
+CREATE TABLE fhvhv_tripdata_jan2020_staging 
+(hvfhs_license_num varchar(6),
+ dispatching_base_num varchar(6),
+ pickup_datetime timestamp,
+ dropoff_datetime timestamp,
+ PULocationID int,
+ DOLocationID int,
+ SR_Flag int);
+
+CREATE TABLE fhvhv_tripdata_feb2020 
+(hvfhs_license_num varchar(6),
+ dispatching_base_num varchar(6),
+ pickup_datetime timestamp,
+ dropoff_datetime timestamp,
+ PULocationID int,
+ DOLocationID int,
+ SR_Flag int);
+
+
+CREATE TABLE fhvhv_tripdata_feb2020_staging 
+(hvfhs_license_num varchar(6),
+ dispatching_base_num varchar(6),
+ pickup_datetime timestamp,
+ dropoff_datetime timestamp,
+ PULocationID int,
+ DOLocationID int,
+ SR_Flag int);
