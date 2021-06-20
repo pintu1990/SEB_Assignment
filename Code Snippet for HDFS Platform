@@ -1,0 +1,89 @@
+#-------- This file contains the code snippets for Apache SQOOP Import and Export. As part of this process we will export all the records from the dataset downloaded from
+NYC website to the MySQL data base. We will be creating hive external tables which will store the data from mysql. We will be using SQOOP export as well as import utility
+to achieve the requirement.
+
+#1. Remove header from the file of linux platform in cloudera to HDFS.
+========================================================================
+
+sed '1d' fhvhv_tripdata_2020-01.csv | hdfs dfs -put - /user/cloudera/sebtest/fhvhv_tripdata_Jan2020.csv
+sed '1d' fhvhv_tripdata_2020-02.csv | hdfs dfs -put - /user/cloudera/sebtest/fhvhv_tripdata_Feb2020.csv
+
+#2. SQOOP export to load all the data from the HDFS file to MYSQL.
+================================================================
+
+sqoop export \
+--connect "jdbc:mysql://quickstart.cloudera:3306/sebtest" \
+--username root \
+-P \
+--table fhvhv_tripdata_jan2020 \
+--staging-table fhvhv_tripdata_jan2020_staging \
+--export-dir /user/cloudera/sebtest/fhvhv_tripdata_Jan2020.csv \
+--num-mappers 10
+--fields-terminated-by ',';
+
+sqoop export \
+--connect "jdbc:mysql://quickstart.cloudera:3306/sebtest" \
+--username root \
+-P \
+--table fhvhv_tripdata_jan2020 \
+--staging-table fhvhv_tripdata_jan2020_staging \
+--export-dir /user/cloudera/sebtest/fhvhv_tripdata_Jan2020.csv \
+--num-mappers 10 \
+--fields-terminated-by ',';
+
+#3. Create Hive external tables in HDFS of cloudera VM
+======================================================
+
+create external table if not exists fhvhv_tripdata_jan2020
+(hvfhs_license_num string,
+ dispatching_base_num string,
+ pickup_datetime string,
+ dropoff_datetime string,
+ PULocationID int,
+ DOLocationID int,
+ SR_Flag int
+)
+row format delimited
+fields terminated by ','
+stored as textfile
+location '/user/hive/warehouse/fhvhv_tripdata_jan2020';
+
+create external table if not exists fhvhv_tripdata_feb2020
+(hvfhs_license_num string,
+ dispatching_base_num string,
+ pickup_datetime string,
+ dropoff_datetime string,
+ PULocationID int,
+ DOLocationID int,
+ SR_Flag int
+)
+row format delimited
+fields terminated by ','
+stored as textfile
+location '/user/hive/warehouse/fhvhv_tripdata_feb2020';
+
+#4. Import records from MYSQL database to hive tables directly using Sqoop Import.
+===================================================================================
+
+sqoop import \
+--connect "jdbc:mysql://quickstart.cloudera:3306/sebtest" \
+--username root \
+-P \
+--table fhvhv_tripdata_jan2020 \
+--hive-import \
+--hive-overwrite \
+--hive-table fhvhv_tripdata_jan2020 \
+--split-by PULocationID;
+
+
+sqoop import \
+--connect "jdbc:mysql://quickstart.cloudera:3306/sebtest" \
+--username root \
+-P \
+--table fhvhv_tripdata_feb2020 \
+--hive-import \
+--hive-overwrite \
+--hive-table fhvhv_tripdata_feb2020 \
+--split-by PULocationID;
+
+
